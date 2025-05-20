@@ -1,0 +1,10 @@
+# .gitignore
+/bin/
+/vendor/
+/*.exe
+/*.test
+*.log
+*.env
+*.pfx
+*.pem
+.history
