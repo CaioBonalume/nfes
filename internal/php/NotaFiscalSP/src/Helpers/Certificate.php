@@ -59,7 +59,6 @@ class Certificate
         $signatureValue = '';
         $pkeyId = openssl_get_privatekey($baseInformation->getCertificate());
         openssl_sign($content, $signatureValue, $pkeyId, OPENSSL_ALGO_SHA1);
-        openssl_free_key($pkeyId);
         return base64_encode($signatureValue);
     }
 

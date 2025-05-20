@@ -1,11 +1,15 @@
 
 # Aviso
-Este é um projeto sem proteção, não nos responsabilizamos sobre nenhum vazamento de dados etc etc melhorar isso dps
+
+Este projeto é fornecido **sem garantias de segurança**. O uso é de sua total responsabilidade. Não nos responsabilizamos por eventuais vazamentos de dados, falhas de segurança ou quaisquer danos decorrentes do uso deste software.
+
+**Recomendamos fortemente** que você revise, adapte e implemente medidas de segurança adequadas antes de utilizar este projeto em ambientes de produção.
 
 # NFEs SP
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
-![Downloads](https://img.shields.io/github/downloads/CaioBonalume/NFE/total
-)
+![Downloads](https://img.shields.io/github/downloads/CaioBonalume/nfes/total)
+![Go.mod](https://img.shields.io/github/go-mod/go-version/CaioBonalume/nfes)
+
 
 
 **Apenas Notas Fiscais de Serviço**
@@ -17,11 +21,11 @@ Este é um projeto sem proteção, não nos responsabilizamos sobre nenhum vazam
 - Soap
 - openssl
 
-O projeto se trata de um servidor local que cria um módulo de conversão de responses de PHP do projeto do [NotaFiscalSP](https://github.com/kaio-souza/NotaFiscalSP) criado por [kaio-souza](https://github.com/kaio-souza). 
+O projeto se trata de um servidor local que cria um módulo que realiza requisições em formato de API e realiza conversão de responses do formato XML para JSON, com motor do projeto [NotaFiscalSP](https://github.com/kaio-souza/NotaFiscalSP) criado por [kaio-souza](https://github.com/kaio-souza). 
 
 Que integra com o sistema de notas da Prefeitura de São Paulo (Nota do Milhão), possibilitando a automatização de serviços como emissão e consulta de Notas e outros serviços relacionados.
 
-O Grande problema não apenas no Go mas em outras linguagens é a dificuldade em assinar o XML sem utilizar JAVA ou Python ou o Soap do PHP.
+O Grande problema não apenas no Go mas em outras linguagens é a dificuldade em assinar o XML sem utilizar métodos em JAVA ou Python ou PHP.
 
 
 
@@ -31,15 +35,14 @@ O Grande problema não apenas no Go mas em outras linguagens é a dificuldade em
 
 - Dados do próprio CNPJ
 #### Consultas
-- Notas fiscais de serviço emitidas
-- Notas fiscais de serviço recebidas
-- Nota fiscal de serviço específica emitida
+- Notas fiscais de serviço emitidas/recebidas
+- Nota fiscal de serviço específica emitida/recebida
 
 #### Emissão
 -  Nota Fiscal de serviço
 
 #### Cancelamento
-- Cancelar nota fiscal de serviço
+- Cancelar nota fiscal de serviço (Não esta funcionando)
 
 
 ## Environment Variables
@@ -75,7 +78,7 @@ Então executar novamente e verificar se o erro permanece.
 
 #### Get dados do CNPJ
 
-```http
+```
   GET /cnpj
 ```
 
@@ -100,10 +103,13 @@ A última linha tem sua Inscrição Municipal caso possua
 }
 ```
 
-#### Get todas notas de serviço emitidas
+#### Get todas notas de serviço emitidas ou recebidas
 
-```http
+```
   GET /nfse/emitida/todas-notas
+```
+```
+  GET /nfse/recebida/todas-notas
 ```
 
 | Parameter | Type     | Exemplo | Description                       |
@@ -181,7 +187,7 @@ O espaço entre as datas não pode ter mais de 31 dias.
 
 #### Get dados de uma nota de serviço emitida específica
 
-```http
+```
   GET /nfse/emitida/nota
 ```
 
@@ -255,6 +261,60 @@ O espaço entre as datas não pode ter mais de 31 dias.
     }
 }
 ```
+
+#### Post nota de serviço
+
+```
+POST /nfse/emitir
+```
+#### Modelo body request
+```json
+{
+    "cnpj": "00027000000000",
+    "im": "00000002", // Opcional, altamente recomendado se você tiver
+    "numero_rps": "123", // Aqui é o próximo numero de nota fiscal, se a ultima foi 122 a proxima será 123.
+//   "tipo_rps": "1", // Opcional, Este campo precisa ser ativado no código conforme apresentado a frente
+    "valor_servicos": "100.00",
+    "codigo_servico": "02919",
+    "aliquota_servicos": "0.0",
+    "cnpj_tomador": "20000004000100",
+    "razao_social_tomador": "RAZAO SOCIAL TOMADOR LTDA",
+    "tipo_logradouro": "R",
+    "logradouro": "NOME DA RUA",
+    "numero_endereco": "147",
+    "bairro": "VILA TESTE",
+    "cep": "00000000",
+    "email_tomador": "teste@teste.com.br",
+    "discriminacao": "Teste Emissão de Notas pela API"
+}
+```
+No caso do POST a requisição deve ter um body ao invés de Query Parameter.
+
+O campo tipo_rps pode receber três tipos de valores:
+```php
+    //Recibo Provisório de Serviços
+    const RECIBO_PROVISORIO = 'RPS';
+
+    //Recibo Provisório de Serviços proveniente de Nota Fiscal Conjugada (Mista)
+    const RECIBO_PROVENIENTE_DE_NOTA_CONJUGADA = 'RPS-M';
+
+    //Cupom
+    const CUPOM = 'RPS-C';
+```
+Para descomentar o campo utilize a rota:
+```bash
+cd internal/php/NotaFiscalSP/meusphp/NF-emitir.php
+```
+
+Há dois campos omitidos que sempre vão junto a requisição que são estado e cidade que são constantes de São Paulo - SP. Se tiver interesse de testar outra localidade altere em:
+```bash
+cd internal/php/NotaFiscalSP/meusphp/NF-emitir.php
+```
+
+#### Remove nota de serviço
+
+Não esta funcionando
+
 ## Referência
 - [kaio-souza](https://github.com/kaio-souza)
 - [NotaFiscalSP](https://github.com/kaio-souza/NotaFiscalSP)
@@ -265,8 +325,13 @@ Para entrar em contato sobre erros ou sugestões de melhora, ou até mesmo fazer
 **gafuz**
 
 
-## Donate
+## Funding
 Se tiver vontade de fazer uma contribuição financeira para este projeto utilize esta chave PIX
+```
+1863751c-2f89-4ce6-b012-45b041bb18d4
+```
+
+
 ## License
 
 MIT License
