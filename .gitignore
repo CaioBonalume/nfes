@@ -1,6 +1,7 @@
 # .gitignore
 /bin/
 /vendor/
+/.idea/
 /*.exe
 /*.test
 *.log
@@ -8,3 +9,5 @@
 *.pfx
 *.pem
 .history
+test.php
+composer.lock
