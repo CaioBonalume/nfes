@@ -1,97 +1,12 @@
 package handlers
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
-	"os"
-	"os/exec"
+
+	"github.com/CaioBonalume/nfes/config"
 )
-
-type NotaRequest struct {
-	CNPJ               string `json:"cnpj"`
-	IM                 string `json:"im"`
-	NumeroRPS          string `json:"numero_rps"`
-	TipoRPS            string `json:"tipo_rps"`
-	ValorServicos      string `json:"valor_servicos"`
-	CodigoServico      string `json:"codigo_servico"`
-	AliquotaServicos   string `json:"aliquota_servicos"`
-	CNPJTomador        string `json:"cnpj_tomador"`
-	RazaoSocialTomador string `json:"razao_social_tomador"`
-	TipoLogradouro     string `json:"tipo_logradouro"`
-	Logradouro         string `json:"logradouro"`
-	NumeroEndereco     string `json:"numero_endereco"`
-	Bairro             string `json:"bairro"`
-	CEP                string `json:"cep"`
-	EmailTomador       string `json:"email_tomador"`
-	Discriminacao      string `json:"discriminacao"`
-}
-
-var (
-	CertPath string
-	CertPass string
-	CertPem  string
-	CertKey  string
-)
-
-func validaCertificado() error {
-	if _, err := os.Stat(CertPath); err != nil {
-		return fmt.Errorf("certificado não encontrado: %v", err)
-	}
-	if CertPass == "" {
-		return fmt.Errorf("senha do certificado não informada")
-	}
-	return nil
-}
-
-func executaPHP(w http.ResponseWriter, args []string) ([]byte, bool) {
-	cmd := exec.Command("php", args...)
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
-
-	output, err := cmd.Output()
-	if err != nil {
-		log.Printf("Erro ao executar PHP: %s", err)
-		log.Printf("Stderr: %s", stderr.String())
-		http.Error(w, "Erro ao executar script PHP: "+err.Error()+"\n"+stderr.String(), http.StatusInternalServerError)
-		return nil, false
-	}
-	return output, true
-}
-
-func ConsultaCNPJHandler(w http.ResponseWriter, r *http.Request) {
-	cnpj := r.URL.Query().Get("cnpj")
-	if cnpj == "" {
-		http.Error(w, "CNPJ não informado", http.StatusBadRequest)
-		return
-	}
-
-	if err := validaCertificado(); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	args := []string{
-		"php/NotaFiscalSP/meusphp/Consulta-CNPJ.php",
-		fmt.Sprintf("--cnpj=%s", cnpj),
-		fmt.Sprintf("--cert_path=%s", CertPath),
-		fmt.Sprintf("--cert_pass=%s", CertPass),
-	}
-
-	cmd := exec.Command("php", args...)
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
-
-	output, ok := executaPHP(w, args)
-	if !ok {
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(output)
-}
 
 func ConsultaNotasEnviadasHandler(w http.ResponseWriter, r *http.Request) {
 	cnpj := r.URL.Query().Get("cnpj")
@@ -106,10 +21,10 @@ func ConsultaNotasEnviadasHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Monta os argumentos básicos
 	args := []string{
-		"php/NotaFiscalSP/meusphp/NF-consultar-enviadas.php",
+		"../../internal/php/meusphp/nfse/NF-consultar-enviadas.php",
 		fmt.Sprintf("--cnpj=%s", cnpj),
-		fmt.Sprintf("--cert_path=%s", CertPath),
-		fmt.Sprintf("--cert_pass=%s", CertPass),
+		fmt.Sprintf("--cert_path=%s", config.Env.CERT_PATH),
+		fmt.Sprintf("--cert_pass=%s", config.Env.CERT_PASS),
 		fmt.Sprintf("--inicio=%s", inicio),
 		fmt.Sprintf("--fim=%s", fim),
 	}
@@ -147,11 +62,11 @@ func ConsultaNotaEnviadaEspecificaHandler(w http.ResponseWriter, r *http.Request
 	}
 
 	args := []string{
-		"php/NotaFiscalSP/meusphp/NF-consultar-emitida-especifica.php",
+		"../../internal/php/NotaFiscalSP/meusphp/NF-consultar-emitida-especifica.php",
 		fmt.Sprintf("--cnpj=%s", cnpj),
 		fmt.Sprintf("--num_nota=%s", numNota),
-		fmt.Sprintf("--cert_path=%s", CertPath),
-		fmt.Sprintf("--cert_pass=%s", CertPass),
+		fmt.Sprintf("--cert_path=%s", config.Env.CERT_PATH),
+		fmt.Sprintf("--cert_pass=%s", config.Env.CERT_PASS),
 	}
 
 	output, ok := executaPHP(w, args)
@@ -176,10 +91,10 @@ func ConsultaNotasRecebidasHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Monta os argumentos básicos
 	args := []string{
-		"php/NotaFiscalSP/meusphp/NF-consultar-recebidas.php",
+		"../../internal/php/NotaFiscalSP/meusphp/NF-consultar-recebidas.php",
 		fmt.Sprintf("--cnpj=%s", cnpj),
-		fmt.Sprintf("--cert_path=%s", CertPath),
-		fmt.Sprintf("--cert_pass=%s", CertPass),
+		fmt.Sprintf("--cert_path=%s", config.Env.CERT_PATH),
+		fmt.Sprintf("--cert_pass=%s", config.Env.CERT_PASS),
 		fmt.Sprintf("--inicio=%s", inicio),
 		fmt.Sprintf("--fim=%s", fim),
 	}
@@ -208,7 +123,7 @@ func EnviarNotaHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Erro ao decodificar o corpo da requisição: "+err.Error(), http.StatusBadRequest)
 		return
 	}
-	if req.CNPJ == "" || CertPath == "" || CertPass == "" {
+	if req.CNPJ == "" || config.Env.CERT_PATH == "" || config.Env.CERT_PASS == "" {
 		http.Error(w, "Parâmetros de cabeçalho obrigatórios ausentes", http.StatusBadRequest)
 		return
 	}
@@ -218,12 +133,16 @@ func EnviarNotaHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Verificar ultimo numero de RPS gerado
+	// var ultimoRPS string
+
 	args := []string{
-		"php/NotaFiscalSP/meusphp/NF-emitir.php",
+		"../../internal/php/meusphp/nfse/NF-emitir.php",
 		fmt.Sprintf("--cnpj=%s", req.CNPJ),
 		fmt.Sprintf("--im=%s", req.IM),
-		fmt.Sprintf("--cert_path=%s", CertPath),
-		fmt.Sprintf("--cert_pass=%s", CertPass),
+		fmt.Sprintf("--cert_path=%s", config.Env.CERT_PATH),
+		fmt.Sprintf("--cert_pass=%s", config.Env.CERT_PASS),
+		fmt.Sprintf("--numero-rps=%s", req.NumeroRPS), // <-- Aqui
 		fmt.Sprintf("--valor-servicos=%s", req.ValorServicos),
 		fmt.Sprintf("--codigo-servico=%s", req.CodigoServico),
 		fmt.Sprintf("--aliquota-servicos=%s", req.AliquotaServicos),
@@ -270,11 +189,11 @@ func CancelarNotaHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	args := []string{
-		"php/NotaFiscalSP/meusphp/NF-cancelar.php",
+		"../../internal/php/NotaFiscalSP/meusphp/NF-cancelar.php",
 		fmt.Sprintf("--cnpj=%s", cnpj),
 		fmt.Sprintf("--num_nota=%s", numNota),
-		fmt.Sprintf("--cert_path=%s", CertPath),
-		fmt.Sprintf("--cert_pass=%s", CertPass),
+		fmt.Sprintf("--cert_path=%s", config.Env.CERT_PATH),
+		fmt.Sprintf("--cert_pass=%s", config.Env.CERT_PASS),
 	}
 
 	output, ok := executaPHP(w, args)

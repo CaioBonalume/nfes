@@ -1,0 +1,57 @@
+{
+    "name": "nfes/unificado",
+    "description": "Integração unificada para NFS-e e NF-e",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "nfephp-org/sped-nfe" : "^5.0",
+        "robrichards/xmlseclibs": "^3.0",
+        "greenter/xmldsig": "^5.0",
+        "spatie/array-to-xml": "^2.8",
+        "ext-curl": "*",
+        "ext-dom": "*",
+        "ext-json": "*",
+        "ext-gd": "*",
+        "ext-mbstring": "*",
+        "ext-openssl": "*",
+        "ext-soap": "*",
+        "ext-xml": "*",
+        "ext-zip": "*",
+        "ext-zlib": "*",
+        "ext-simplexml": "*"
+    },
+    "suggest": {
+        "ext-mbstring": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "NotaFiscalSP\\": "NotaFiscalSP/src/",
+            "NFePHP\\NFe\\": "sped-nfe/src/"
+        }
+    },
+    "keywords": [
+        "NFS",
+        "NFTS",
+        "Emissão Nota Fiscal",
+        "Nota Fiscal",
+        "Nota do Milhão",
+        "Prefeitura São Paulo",
+        "Nota Fiscal Tomador de Serviços"
+    ],
+     "authors": [
+        {
+            "name": "Caio Bonalume",
+            "email": "caiobdesigner@mgial.com"
+        },
+        {
+            "name": "Caio Bonalume"
+        }
+    ],
+     "require-dev": {
+        "phpunit/phpunit": ">=7.0"
+    },
+     "scripts": {
+        "test": "vendor/bin/phpunit"
+    },
+    "minimum-stability": "stable"
+}

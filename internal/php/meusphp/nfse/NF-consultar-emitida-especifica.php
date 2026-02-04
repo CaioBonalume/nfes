@@ -1,7 +1,7 @@
 <?php
 
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../../vendor/autoload.php';
 
 use NotaFiscalSP\Constants\Params;
 use NotaFiscalSP\NotaFiscalSP;
@@ -9,12 +9,13 @@ use NotaFiscalSP\NotaFiscalSP;
 // Recebe os parâmetros do terminal
 $options = getopt("", [
     "cnpj:",
+    "num_nota:",
     "cert_path:",
     "cert_pass:",
 ]);
 
-if (empty($options['cnpj']) || empty($options['cert_path']) || empty($options['cert_pass'])) {
-    echo json_encode(['error' => 'Parâmetros obrigatórios: --cnpj, --cert_path, --cert_pass']);
+if (empty($options['num_nota']) || empty($options['cert_path']) || empty($options['cert_pass'])) {
+    echo json_encode(['error' => 'Parâmetros obrigatórios: --num_nota, --cert_path, --cert_pass']);
     exit(1);
 }
 
@@ -26,8 +27,8 @@ $config = [
 
 $nfSP = new NotaFiscalSP($config);
 
-// Consulta o CNPJ
-$response = $nfSP->cnpjInfo($options['cnpj']);
+// Consulta uma nota fiscal específica
+$response = $nfSP->consultarNf($options['num_nota']);
 
 echo json_encode($response);
 exit;

@@ -2,6 +2,10 @@
 /bin/
 /vendor/
 /.idea/
+/keys/
+/internal/php/vendor/
+/internal/php/sped-nfe/
+/internal/php/NotaFiscalSP/
 /*.exe
 /*.test
 *.log

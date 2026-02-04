@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../../vendor/autoload.php';
 
 use NotaFiscalSP\Constants\Params;
 use NotaFiscalSP\Entities\Requests\NF\Period;
@@ -39,7 +39,7 @@ if (!empty($options['im'])) {
     $period->setInscricaoMunicipal($options['im']);
 }
 
-$emitidas = $nf->notasRecebidas($period);
+$emitidas = $nf->notasEmitidas($period);
 
 echo json_encode($emitidas->getResponse());
 exit;

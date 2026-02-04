@@ -1,7 +1,7 @@
 <?php
 
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../../vendor/autoload.php';
 
 use NotaFiscalSP\Constants\Params;
 use NotaFiscalSP\NotaFiscalSP;
@@ -27,8 +27,8 @@ $config = [
 
 $nfSP = new NotaFiscalSP($config);
 
-// Consulta uma nota fiscal específica
-$response = $nfSP->consultarNf($options['num_nota']);
+// Cancela nota fiscal
+$response = $nfSP->cancelarNota($options['num_nota']);
 
 echo json_encode($response);
 exit;

@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../../vendor/autoload.php';
 
 use NotaFiscalSP\Constants\FieldData\RPSType;
 use NotaFiscalSP\Entities\Requests\NF\Rps;
@@ -44,6 +44,8 @@ $nf = new NotaFiscalSP($config);
 
 // Monte a RPS
 $rps = new Rps();
+date_default_timezone_set('America/Sao_Paulo');
+$rps->setDataEmissao(date('Y-m-d'));
 $rps->setNumeroRps($options['numero-rps']);
 // $rps->setTipoRps(RPSType::RECIBO_PROVENIENTE_DE_NOTA_CONJUGADA); // Verificar depois
 $rps->setValorServicos(isset($options['valor-servicos']) ? (float)$options['valor-servicos'] : 0.0);

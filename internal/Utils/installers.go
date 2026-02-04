@@ -92,7 +92,7 @@ func InstallDependencies() error {
 	// Executa composer install no diretório do projeto PHP
 	fmt.Println("Executando 'composer install' no diretório do projeto PHP...")
 	cmd := exec.Command("composer", "install")
-	cmd.Dir = "php/NotaFiscalSP"
+	cmd.Dir = "../../internal/php/NotaFiscalSP" // <--- alterar rota
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {

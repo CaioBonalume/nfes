@@ -6,6 +6,7 @@ func XMLConsultaCNPJ(cnpj string) string {
 	return fmt.Sprintf(`<?xml version="1.0" encoding="UTF-8"?>
 <p1:PedidoConsultaCNPJ xmlns:p1="http://www.prefeitura.sp.gov.br/nfe" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <Cabecalho Versao="1">
+    
         <CPFCNPJRemetente>
             <CNPJ>%s</CNPJ>
         </CPFCNPJRemetente>
